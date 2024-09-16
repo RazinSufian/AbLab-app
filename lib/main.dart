@@ -8,7 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/l10n.dart'; // Localization support
 
 
-
+// tring a commit
 void main() {
   runApp(const MainPage());
 }
