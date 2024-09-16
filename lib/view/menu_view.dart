@@ -1,5 +1,5 @@
 import 'package:ab_lab_app/view/patient_entry_views/patient_entry.dart';
-import 'package:ab_lab_app/view/patient_list_viwes/patient_list.dart';
+import 'package:ab_lab_app/view/report_list_viwes/report_list_view.dart';
 import 'package:ab_lab_app/view/sales_views/sales_view.dart';
 import 'package:ab_lab_app/view/setting_views/settings_view.dart';
 import 'package:ab_lab_app/view/test_views/test_view.dart';
@@ -35,7 +35,7 @@ class _MenuViewState extends State<MenuView> {
   // Pages to be displayed in PageView
   final List<Widget> _pages = [
     SalesPage(),
-    PatientListPage(),
+    ReportListPage(),
     TestsPage(),
     PatientEntryPage(),
     SettingsPage(),

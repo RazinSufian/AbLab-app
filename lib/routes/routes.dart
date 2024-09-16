@@ -6,7 +6,7 @@ import 'package:page_transition/page_transition.dart';
 
 import '../view/auth_views/auth_view.dart';
 import '../view/patient_entry_views/patient_entry.dart';
-import '../view/patient_list_viwes/patient_list.dart';
+import '../view/report_list_viwes/report_list_view.dart';
 import '../view/sales_views/sales_view.dart';
 import '../view/setting_views/settings_view.dart';
 import '../view/test_views/test_view.dart';
@@ -26,7 +26,7 @@ class Routes {
     case RoutesName.sales:
     return PageTransition(type: PageTransitionType.rightToLeft, child: SalesPage());
     case RoutesName.patientList:
-    return PageTransition(type: PageTransitionType.rightToLeft, child: PatientListPage());
+    return PageTransition(type: PageTransitionType.rightToLeft, child: ReportListPage());
     case RoutesName.patientEntry:
     return PageTransition(type: PageTransitionType.rightToLeft, child: PatientEntryPage());
     case RoutesName.tests:

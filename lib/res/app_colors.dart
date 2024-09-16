@@ -21,6 +21,11 @@ class AppColors{
 
   static const light_grayColor = const Color(0xFFD9D9D9);
   static const skyBGColor = const Color(0xFF7CA2F8);
+  static const lineColor = const Color(0xFFDBD0BF);
+
+  static const row_havy_blue = const Color(0xFFD7E3FC);
+
+  static const row_light_blue = const Color(0xFFABC4FF);
 
 
 

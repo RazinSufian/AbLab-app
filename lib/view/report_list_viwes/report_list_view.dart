@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class PatientListPage extends StatelessWidget {
+class ReportListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

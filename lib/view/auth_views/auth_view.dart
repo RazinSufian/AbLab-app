@@ -232,7 +232,7 @@ class AuthPageState extends State<AuthPage> {
           text: 'Sign Up',
           onPressed: () {
             // Navigate to the menu page
-            Navigator.pushNamedAndRemoveUntil(context, RoutesName.menu, (route) => false);
+            Navigator.pushReplacementNamed(context, RoutesName.menu);
           },
         ),
       ],

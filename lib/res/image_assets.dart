@@ -6,4 +6,7 @@ class ImageAssets {
   static const String nav_patient_list = 'assets/icons/patient_list_nav.png';
   static const String nav_settings = 'assets/icons/settings_nav.png';
   static const String nav_tests = 'assets/icons/tests_nav.png';
+  static const String backButton = 'assets/icons/backButton.png';
+  static const String loadingGif = 'assets/gif/blue_loading.gif';
+  static const String white_drop_down = 'assets/icons/white_drop_down.png';
 }

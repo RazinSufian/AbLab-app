@@ -44,6 +44,8 @@ dependencies:
   persistent_bottom_nav_bar_v2: ^5.2.3
   http: ^1.2.2  # Add this line for the http package (use the latest version if needed)
   page_transition: ^2.1.0
+  provider: ^6.1.2
+  another_flushbar: ^1.12.30
 
 
 
