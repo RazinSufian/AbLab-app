@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/singin_controller.dart';
 import '../../controller/singup_controller.dart';
+import '../../res/app_colors.dart';
 import '../../res/image_assets.dart';
+import '../../routes/routes_name.dart'; // Make sure to import RoutesName
 import '../../utils/components/round_text_bar.dart';  // Include the correct utility imports
 import '../../utils/components/custom_rounded_btn.dart';
 
@@ -63,33 +65,34 @@ class AuthPageState extends State<AuthPage> {
 
               // Row with text and image
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween, // Add space between text and image
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Leave the left side empty for spacing
                   Spacer(),
-
                   // Image aligned to the right
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      height: screenHeight * 0.1,
-                      width: screenWidth * 0.2,
-                      color: Colors.white,
-                      child: Image.asset(ImageAssets.logo,
-                        width: 150,  // Set width if needed
-                        height: 150,),
+                  Expanded(  // Wrap the Container with Expanded to give it more space
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Container(
+                        color: Colors.white,
+                        child: Image.asset(
+                          ImageAssets.logo_2,
+                          width: screenWidth * 0.25,  // Use screenWidth to adjust the size dynamically
+                          height: screenHeight * 0.10, // Use screenHeight to adjust the size dynamically
+                          fit: BoxFit.contain,  // Adjust the fit property to change how the image fills the space
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
 
-              SizedBox(height: screenHeight * 0.09),
+              SizedBox(height: screenHeight * 0.015),
               Center(
                 child: Column(
                   children: [
                     _buildTabBar(),
-                    SizedBox(height: screenHeight * 0.03),
-                    _isSelected[0] ? _buildSignInForm() : _buildSignUpForm(),
+                    SizedBox(height: screenHeight * 0.02),
+                    _isSelected[0] ? _buildSignInForm(context) : _buildSignUpForm(),
                   ],
                 ),
               ),
@@ -101,16 +104,17 @@ class AuthPageState extends State<AuthPage> {
   }
 
   Widget _buildTabBar() {
+    var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
     return Container(
       padding: EdgeInsets.all(0.0),
       decoration: BoxDecoration(
-        color: Color(0xFFE8E5F9),
+        color: AppColors.light_grayColor,
         borderRadius: BorderRadius.circular(50),
       ),
       child: Container(
         padding: EdgeInsets.all(5.0),
-        height: 40.0,
+        height: screenHeight * 0.05,
         child: Row(
           children: <Widget>[
             _buildTabItem("Sign In", 0),
@@ -161,13 +165,16 @@ class AuthPageState extends State<AuthPage> {
     );
   }
 
-  Widget _buildSignInForm() {
+  Widget _buildSignInForm(BuildContext context) {
+    var screenHeight = MediaQuery.of(context).size.height; // Define screenHeight here
     return Column(
       children: [
+        SizedBox(height: screenHeight * 0.034),
         RoundInputField(
           name: 'Email Address',
           onChanged: (value) => signInController.emailTextController = value,
         ),
+        SizedBox(height: screenHeight * 0.015),
         RoundInputField(
           name: 'Password',
           isPassword: true,
@@ -184,7 +191,8 @@ class AuthPageState extends State<AuthPage> {
         CustomButton(
           text: 'Sign In',
           onPressed: () {
-            // Add your sign in logic here
+            // Navigate to the menu page
+            Navigator.pushNamedAndRemoveUntil(context, RoutesName.menu, (route) => false);
           },
         ),
       ],
@@ -192,17 +200,21 @@ class AuthPageState extends State<AuthPage> {
   }
 
   Widget _buildSignUpForm() {
+    var screenHeight = MediaQuery.of(context).size.height; // Define screenHeight here
     return Column(
       children: [
+        SizedBox(height: screenHeight * 0.034),
         RoundInputField(
           name: 'Email Address',
           onChanged: (value) => signUpController.emailTextController = value,
         ),
+        SizedBox(height: screenHeight * 0.015),
         RoundInputField(
           name: 'Password',
           isPassword: true,
           onChanged: (value) => signUpController.passwordTextController = value,
         ),
+        SizedBox(height: screenHeight * 0.015),
         RoundInputField(
           name: 'Confirm Password',
           isPassword: true,
@@ -219,11 +231,11 @@ class AuthPageState extends State<AuthPage> {
         CustomButton(
           text: 'Sign Up',
           onPressed: () {
-            // Add your sign up logic here
+            // Navigate to the menu page
+            Navigator.pushNamedAndRemoveUntil(context, RoutesName.menu, (route) => false);
           },
         ),
       ],
     );
   }
 }
-

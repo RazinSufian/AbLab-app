@@ -21,13 +21,13 @@ class CustomButton extends StatelessWidget {
     var size = MediaQuery.of(context).size;
 
     return Padding(
-      padding: EdgeInsets.only(top: size.height*.02 , left: size.width*.25, right: size.width*.25 ),
+      padding: EdgeInsets.only(top: size.height*.03 , left: size.width*.10, right: size.width*.10 ),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? AppColors.activeBGColor, // Use provided color or default
+          backgroundColor: backgroundColor ?? AppColors.skyBGColor, // Use provided color or default
           minimumSize: Size(
-            MediaQuery.of(context).size.width * 0.5,
+            MediaQuery.of(context).size.width * 0.55,
             MediaQuery.of(context).size.height * 0.05,
           ),
           shape: RoundedRectangleBorder(
@@ -37,8 +37,9 @@ class CustomButton extends StatelessWidget {
         child: Text(
           text,
           style: TextStyle(
-            color: Colors.white, // Replace with your desired text color
-            fontWeight: FontWeight.normal,
+            fontSize: 16, // Use the same font size as in _buildTabItem
+            fontWeight: FontWeight.w500, // Use the same font weight as in _buildTabItem
+            color: Colors.white, // Keep the text color as white or customize it
           ),
         ),
       ),
