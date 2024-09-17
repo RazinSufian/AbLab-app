@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../model/sales_report_summary.dart';
 import '../repository/sales_repo.dart';
 
-class ReportViewModel with ChangeNotifier {
+class SalesViewModel with ChangeNotifier {
   final ReportRepository _reportRepository = ReportRepository();
   ReportResponse? _reportResponse;
   bool _isLoading = false;

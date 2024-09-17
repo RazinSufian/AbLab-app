@@ -35,7 +35,7 @@ class _SalesPageState extends State<SalesPage> {
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
-    final reportViewModel = Provider.of<ReportViewModel>(context);
+    final reportViewModel = Provider.of<SalesViewModel>(context);
 
     // Calculate totals
     int totalPatients = 0;

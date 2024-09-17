@@ -9,4 +9,6 @@ class ImageAssets {
   static const String backButton = 'assets/icons/backButton.png';
   static const String loadingGif = 'assets/gif/blue_loading.gif';
   static const String white_drop_down = 'assets/icons/white_drop_down.png';
+  static const String calendarIcons = 'assets/icons/calendar_icon.png';
+
 }

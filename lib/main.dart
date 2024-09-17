@@ -1,5 +1,6 @@
 import 'package:ab_lab_app/routes/routes.dart';
 import 'package:ab_lab_app/routes/routes_name.dart';
+import 'package:ab_lab_app/view_model/report_list_view_model.dart';
 import 'package:ab_lab_app/view_model/sales_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,7 +30,8 @@ class MainPage extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ReportViewModel()), // Add ReportViewModel provider
+        ChangeNotifierProvider(create: (_) => SalesViewModel()),
+        ChangeNotifierProvider(create: (_) => ReportListViewModel())// Add ReportViewModel provider
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

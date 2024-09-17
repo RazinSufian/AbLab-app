@@ -10,5 +10,7 @@ class AppUrl {
   static var baseUrl = 'https://3p3xvw09xg.execute-api.ap-south-1.amazonaws.com' + current_stage;
 
   static var reportMonthlySummary =  baseUrl + '/report_list';
+  static var reportListEndpoint = baseUrl + '/report_list';
+
 
 }
