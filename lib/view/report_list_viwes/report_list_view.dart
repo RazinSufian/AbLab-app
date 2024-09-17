@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../utils/components/commonHeader.dart';
 import '../../utils/components/customPicker.dart';
+import '../../utils/components/report_row_widget.dart';
 import '../../utils/utils.dart';
 import '../../view_model/report_list_view_model.dart';
 import '../../res/image_assets.dart';
@@ -40,6 +41,11 @@ class _ReportListPageState extends State<ReportListPage> {
 
     // Update day_range based on current month and year
     _updateDayRange();
+
+    // Clear selectedQuery if not in month selection mode
+    if (!searchByMonth) {
+      selectedQuery = '';
+    }
   }
 
   @override
@@ -72,12 +78,7 @@ class _ReportListPageState extends State<ReportListPage> {
                     Switch(
                       value: searchByMonth,
                       onChanged: (value) {
-                        setState(() {
-                          searchByMonth = value;
-                          selectedQuery = null; // Reset selections
-                          selectedDate = null;
-                          selectedWeek = null;
-                        });
+                        _toggleSearchByMonth(value);
                       },
                     ),
                   ],
@@ -107,11 +108,33 @@ class _ReportListPageState extends State<ReportListPage> {
               ],
             ),
           ),
+          // Labels for report status
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(width: 10, height: 10, color: Colors.red), // Red dot
+                    SizedBox(width: 5),
+                    Text('Unpaid Reports', style: TextStyle(fontSize: 14)),
+                  ],
+                ),
+                SizedBox(width: 20),
+                Row(
+                  children: [
+                    Container(width: 10, height: 10, color: Colors.yellow), // Yellow dot
+                    SizedBox(width: 5),
+                    Text('Report Incomplete', style: TextStyle(fontSize: 14)),
+                  ],
+                ),
+              ],
+            ),
+          ),
           // Space for displaying fetched data
           Expanded(
-            child: reportViewModel.isLoading
-                ? Center(child: CircularProgressIndicator())
-                : reportViewModel.errorMessage.isNotEmpty
+            child: reportViewModel.errorMessage.isNotEmpty
                 ? Center(child: Text(reportViewModel.errorMessage))
                 : reportViewModel.reportList.isEmpty
                 ? Center(child: Text('No report data available'))
@@ -119,13 +142,43 @@ class _ReportListPageState extends State<ReportListPage> {
               itemCount: reportViewModel.reportList.length,
               itemBuilder: (context, index) {
                 final report = reportViewModel.reportList[index];
-                return ListTile(
-                  title: Text(report.patientName),
-                  subtitle: Text('Referred by: ${report.referredBy}'),
+
+                // Calculate total = estimatedTotal * discount
+                double total = double.parse(report.estimatedTotal) * (1 - double.parse(report.discount) / 100);
+
+                // Calculate due = total - paidAmount
+                double due = total - double.parse(report.paidAmount);
+
+                // Default background color based on index
+                Color backgroundColor = index % 2 == 0
+                    ? AppColors.row_havy_blue
+                    : AppColors.row_light_blue;
+
+                // Check if due amount is greater than 10
+                if (due > 10) {
+                  backgroundColor = Colors.red;
+                } else if (report.testReportStatus != null) {
+                  // Only check testReportStatus if backgroundColor is not already red
+                  report.testReportStatus.forEach((testId, status) {
+                    if (status == "0") {
+                      backgroundColor = Colors.yellow;
+                    }
+                  });
+                }
+
+                return ReportListDataRow(
+                  name: report.patientName,
+                  reportId: report.reportId,
+                  date: report.entryDate,
+                  estimatedTotal: report.estimatedTotal,
+                  discount: report.discount,
+                  paidAmount: report.paidAmount,
+                  backgroundColor: backgroundColor,
                 );
               },
             ),
           ),
+
         ],
       ),
     );
@@ -293,25 +346,34 @@ class _ReportListPageState extends State<ReportListPage> {
     }
   }
 
-// Fetch data
+  // Fetch data
   void _fetchData(ReportListViewModel viewModel) {
-    if (searchByMonth && selectedQuery != null) {
-      // Use selectedQuery which is in the correct 'day_range=YYYY-MM-01_to_YYYY-MM-31' format
-      Utils.showLoading(context);
-      viewModel.fetchReport(selectedQuery!).then((_) {
-        Utils.cancelLoading(context);
-      });
-    } else if (!searchByMonth && selectedQuery != null) {
-      Utils.showLoading(context);
-      viewModel.fetchReport(selectedQuery!).then((_) {
-        Utils.cancelLoading(context);
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select a query parameter')),
+    // Check if the query parameter is empty
+    if ((searchByMonth && selectedQuery == "") || (!searchByMonth && selectedQuery == "")) {
+      Utils.showFlashMessage(
+        context: context,
+        message: 'Please select a query parameter',
+        backgroundColor: Colors.red, // You can customize the color as needed
+        icon: Icons.warning, // Optional: Use an icon if desired
       );
+      return; // Exit the method if no query parameter is selected
     }
+
+    // Use selectedQuery for API call
+    Utils.showLoading(context); // Show custom loading indicator
+    viewModel.fetchReport(selectedQuery!).then((_) {
+      Utils.cancelLoading(context); // Hide custom loading indicator
+    });
   }
 
-}
 
+  // Toggle Search By Month
+  void _toggleSearchByMonth(bool value) {
+    setState(() {
+      searchByMonth = value;
+      selectedQuery = ''; // Reset selectedQuery if not in month selection mode
+      selectedDate = null;
+      selectedWeek = null;
+    });
+  }
+}
