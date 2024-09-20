@@ -23,9 +23,21 @@ class _ReportListPageState extends State<ReportListPage> {
 
   // For month-based search
   final List<String> months = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
   ];
-  final List<String> years = List.generate(2044 - DateTime.now().year + 1, (index) => (DateTime.now().year + index).toString());
+  final List<String> years = List.generate(2044 - DateTime.now().year + 1,
+      (index) => (DateTime.now().year + index).toString());
 
   String? selectedMonth;
   String? selectedYear;
@@ -65,7 +77,8 @@ class _ReportListPageState extends State<ReportListPage> {
             },
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -73,13 +86,18 @@ class _ReportListPageState extends State<ReportListPage> {
                   children: [
                     Text(
                       'Search by Month',
-                      style: TextStyle(fontSize: 15, color: AppColors.blackColor), // Apply custom styling
+                      style: TextStyle(
+                          fontSize: 15,
+                          color: AppColors.blackColor), // Apply custom styling
                     ),
                     Switch(
                       value: searchByMonth,
                       onChanged: (value) {
                         _toggleSearchByMonth(value);
                       },
+                      activeTrackColor: AppColors
+                          .skyBGColor, // Background color of the switch when it's on
+                      // activeColor: AppColors.skyBGColor,  // Thumb color when the switch is on
                     ),
                   ],
                 ),
@@ -89,7 +107,9 @@ class _ReportListPageState extends State<ReportListPage> {
                   },
                   child: Text(
                     'Fetch Data',
-                    style: TextStyle(fontSize: 15, color: AppColors.blackColor), // Apply custom styling
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: AppColors.activeBGColor), // Apply custom styling
                   ),
                 ),
               ],
@@ -103,20 +123,23 @@ class _ReportListPageState extends State<ReportListPage> {
               children: [
                 Expanded(
                   flex: 1,
-                  child: searchByMonth ? _buildMonthSearch() : _buildDateSearch(),
+                  child:
+                      searchByMonth ? _buildMonthSearch() : _buildDateSearch(),
                 ),
               ],
             ),
           ),
           // Labels for report status
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Container(width: 10, height: 10, color: Colors.red), // Red dot
+                    Container(width: 10, height: 10, color: Colors.red),
+                    // Red dot
                     SizedBox(width: 5),
                     Text('Unpaid Reports', style: TextStyle(fontSize: 14)),
                   ],
@@ -124,7 +147,8 @@ class _ReportListPageState extends State<ReportListPage> {
                 SizedBox(width: 20),
                 Row(
                   children: [
-                    Container(width: 10, height: 10, color: Colors.yellow), // Yellow dot
+                    Container(width: 10, height: 10, color: Colors.yellow),
+                    // Yellow dot
                     SizedBox(width: 5),
                     Text('Report Incomplete', style: TextStyle(fontSize: 14)),
                   ],
@@ -137,48 +161,53 @@ class _ReportListPageState extends State<ReportListPage> {
             child: reportViewModel.errorMessage.isNotEmpty
                 ? Center(child: Text(reportViewModel.errorMessage))
                 : reportViewModel.reportList.isEmpty
-                ? Center(child: Text('No report data available'))
-                : ListView.builder(
-              itemCount: reportViewModel.reportList.length,
-              itemBuilder: (context, index) {
-                final report = reportViewModel.reportList[index];
+                    ? Center(
+                        child: Text(
+                          'No report data available',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: reportViewModel.reportList.length,
+                        itemBuilder: (context, index) {
+                          final report = reportViewModel.reportList[index];
 
-                // Calculate total = estimatedTotal * discount
-                double total = double.parse(report.estimatedTotal) * (1 - double.parse(report.discount) / 100);
+                          // Calculate total = estimatedTotal * discount
+                          double total = double.parse(report.estimatedTotal) *
+                              (1 - double.parse(report.discount) / 100);
 
-                // Calculate due = total - paidAmount
-                double due = total - double.parse(report.paidAmount);
+                          // Calculate due = total - paidAmount
+                          double due = total - double.parse(report.paidAmount);
 
-                // Default background color based on index
-                Color backgroundColor = index % 2 == 0
-                    ? AppColors.row_havy_blue
-                    : AppColors.row_light_blue;
+                          // Default background color based on index
+                          Color backgroundColor = index % 2 == 0
+                              ? AppColors.row_havy_blue
+                              : AppColors.row_light_blue;
 
-                // Check if due amount is greater than 10
-                if (due > 10) {
-                  backgroundColor = Colors.red;
-                } else if (report.testReportStatus != null) {
-                  // Only check testReportStatus if backgroundColor is not already red
-                  report.testReportStatus.forEach((testId, status) {
-                    if (status == "0") {
-                      backgroundColor = Colors.yellow;
-                    }
-                  });
-                }
+                          // Check if due amount is greater than 10
+                          if (due > 10) {
+                            backgroundColor = Colors.red;
+                          } else if (report.testReportStatus != null) {
+                            // Only check testReportStatus if backgroundColor is not already red
+                            report.testReportStatus.forEach((testId, status) {
+                              if (status == "0") {
+                                backgroundColor = Colors.yellow;
+                              }
+                            });
+                          }
 
-                return ReportListDataRow(
-                  name: report.patientName,
-                  reportId: report.reportId,
-                  date: report.entryDate,
-                  estimatedTotal: report.estimatedTotal,
-                  discount: report.discount,
-                  paidAmount: report.paidAmount,
-                  backgroundColor: backgroundColor,
-                );
-              },
-            ),
+                          return ReportListDataRow(
+                            name: report.patientName,
+                            reportId: report.reportId,
+                            date: report.entryDate,
+                            estimatedTotal: report.estimatedTotal,
+                            discount: report.discount,
+                            paidAmount: report.paidAmount,
+                            backgroundColor: backgroundColor,
+                          );
+                        },
+                      ),
           ),
-
         ],
       ),
     );
@@ -197,7 +226,8 @@ class _ReportListPageState extends State<ReportListPage> {
     // Format the dates
     String todayString = 'day=${today.toIso8601String().split('T')[0]}';
     String yesterdayString = 'day=${yesterday.toIso8601String().split('T')[0]}';
-    String dayBeforeYesterdayString = 'day=${dayBeforeYesterday.toIso8601String().split('T')[0]}';
+    String dayBeforeYesterdayString =
+        'day=${dayBeforeYesterday.toIso8601String().split('T')[0]}';
 
     return Row(
       children: [
@@ -221,7 +251,8 @@ class _ReportListPageState extends State<ReportListPage> {
               if (pickedDate != null) {
                 setState(() {
                   selectedDate = pickedDate;
-                  selectedQuery = 'day=${pickedDate.toIso8601String().split('T')[0]}';
+                  selectedQuery =
+                      'day=${pickedDate.toIso8601String().split('T')[0]}';
                   selectedWeek = null; // Reset week selection
                 });
               }
@@ -229,32 +260,41 @@ class _ReportListPageState extends State<ReportListPage> {
             isRequired: false,
           ),
         ),
-        SizedBox(width: screenWidth * 0.05), // Space between the CustomPicker and Dropdown
+        SizedBox(width: screenWidth * 0.05),
+        // Space between the CustomPicker and Dropdown
 
         // Dropdown for selecting the week range
         DropdownButton<String>(
-          hint: Text('Select', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)), // Placeholder text
-          value: selectedWeek, // Default to null so it shows the hint
+          hint: Text('Select',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+          // Placeholder text
+          value: selectedWeek,
+          // Default to null so it shows the hint
           items: [
             DropdownMenuItem(
               value: todayString,
-              child: Text('Today', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+              child: Text('Today',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
             ),
             DropdownMenuItem(
               value: yesterdayString,
-              child: Text('Previous Day', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+              child: Text('Previous Day',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
             ),
             DropdownMenuItem(
               value: dayBeforeYesterdayString,
-              child: Text('Day Before Yesterday', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+              child: Text('Day Before Yesterday',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
             ),
             DropdownMenuItem(
               value: 'week=1',
-              child: Text('This Week', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+              child: Text('This Week',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
             ),
             DropdownMenuItem(
               value: 'week=2',
-              child: Text('Previous Week', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+              child: Text('Previous Week',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
             ),
           ],
           onChanged: (newValue) {
@@ -276,14 +316,22 @@ class _ReportListPageState extends State<ReportListPage> {
         Expanded(
           flex: 1,
           child: DropdownButton<String>(
-            hint: Text('Select Month', style: TextStyle(fontSize: 15, color: AppColors.blackColor, fontWeight: FontWeight.w400)), // Apply custom styling to hint
+            hint: Text('Select Month',
+                style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.blackColor,
+                    fontWeight:
+                        FontWeight.w400)), // Apply custom styling to hint
             value: selectedMonth,
             items: months.map((String month) {
               return DropdownMenuItem<String>(
                 value: month,
                 child: Text(
                   month,
-                  style: TextStyle(fontSize: 15, color: AppColors.blackColor), // Apply custom styling to items
+                  style: TextStyle(
+                      fontSize: 15,
+                      color: AppColors
+                          .blackColor), // Apply custom styling to items
                 ),
               );
             }).toList(),
@@ -299,14 +347,22 @@ class _ReportListPageState extends State<ReportListPage> {
         Expanded(
           flex: 1,
           child: DropdownButton<String>(
-            hint: Text('Select Year', style: TextStyle(fontSize: 15, color: AppColors.blackColor, fontWeight: FontWeight.w400)), // Apply custom styling to hint
+            hint: Text('Select Year',
+                style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.blackColor,
+                    fontWeight:
+                        FontWeight.w400)), // Apply custom styling to hint
             value: selectedYear,
             items: years.map((String year) {
               return DropdownMenuItem<String>(
                 value: year,
                 child: Text(
                   year,
-                  style: TextStyle(fontSize: 15, color: AppColors.blackColor), // Apply custom styling to items
+                  style: TextStyle(
+                      fontSize: 15,
+                      color: AppColors
+                          .blackColor), // Apply custom styling to items
                 ),
               );
             }).toList(),
@@ -326,17 +382,22 @@ class _ReportListPageState extends State<ReportListPage> {
   void _updateDayRange() {
     if (selectedMonth != null && selectedYear != null) {
       // Find the index of the selected month
-      int monthIndex = months.indexOf(selectedMonth!) + 1; // +1 because index is 0-based
-      String month = monthIndex.toString().padLeft(2, '0'); // Ensure two-digit format for month
+      int monthIndex =
+          months.indexOf(selectedMonth!) + 1; // +1 because index is 0-based
+      String month = monthIndex
+          .toString()
+          .padLeft(2, '0'); // Ensure two-digit format for month
       String year = selectedYear!;
 
       // Determine the last day of the month
       DateTime firstDayOfMonth = DateTime(int.parse(year), monthIndex, 1);
-      DateTime lastDayOfMonth = DateTime(int.parse(year), monthIndex + 1, 0); // 0th day of next month
+      DateTime lastDayOfMonth =
+          DateTime(int.parse(year), monthIndex + 1, 0); // 0th day of next month
 
       // Format the date range
       String startDate = '${year}-${month}-01';
-      String endDate = '${year}-${month}-${lastDayOfMonth.day.toString().padLeft(2, '0')}';
+      String endDate =
+          '${year}-${month}-${lastDayOfMonth.day.toString().padLeft(2, '0')}';
 
       // Construct the day_range parameter
       selectedQuery = 'day_range=${startDate}_to_${endDate}';
@@ -349,7 +410,8 @@ class _ReportListPageState extends State<ReportListPage> {
   // Fetch data
   void _fetchData(ReportListViewModel viewModel) {
     // Check if the query parameter is empty
-    if ((searchByMonth && selectedQuery == "") || (!searchByMonth && selectedQuery == "")) {
+    if ((searchByMonth && selectedQuery == "") ||
+        (!searchByMonth && selectedQuery == "")) {
       Utils.showFlashMessage(
         context: context,
         message: 'Please select a query parameter',
@@ -365,7 +427,6 @@ class _ReportListPageState extends State<ReportListPage> {
       Utils.cancelLoading(context); // Hide custom loading indicator
     });
   }
-
 
   // Toggle Search By Month
   void _toggleSearchByMonth(bool value) {

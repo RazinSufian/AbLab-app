@@ -11,9 +11,11 @@ class ReportRepository {
   Future<List<Report>> fetchReportList(String queryParams) async {
     try {
       print('queryParams: $queryParams');
+      print("url:${AppUrl.reportListEndpoint}?$queryParams");
       String url = '${AppUrl.reportListEndpoint}?$queryParams'; // Assume you have this URL in app_urls.dart
       dynamic response = await _apiServices.getGetApiResponse(url);
       List<Report> reportList = [];
+      print(response);
       if (response['reports'] != null) {
         response['reports'].forEach((v) {
           reportList.add(Report.fromJson(v));
