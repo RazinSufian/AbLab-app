@@ -1,6 +1,6 @@
 import 'package:ab_lab_app/res/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'customButton.dart';
+import '../../utils/components/customButton.dart';
 
 class TestReportContainer extends StatelessWidget {
   final String testName;

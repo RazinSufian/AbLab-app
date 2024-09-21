@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../utils/components/commonHeader.dart';
 import '../../utils/components/customPicker.dart';
-import '../../utils/components/report_row_widget.dart';
+import 'report_row_widget.dart';
 import '../../utils/utils.dart';
 import '../../view_model/report_list_view_model.dart';
 import '../../res/image_assets.dart';
@@ -156,58 +156,94 @@ class _ReportListPageState extends State<ReportListPage> {
               ],
             ),
           ),
+          // Add your new header row here
+          // Conditionally show the header row and divider
+          if (reportViewModel.reportList.isNotEmpty) ...[
+            SizedBox(height: screenHeight * 0.03),
+            // Header Row
+            Padding(
+              padding: EdgeInsets.only(left: screenWidth * 0.0),
+              child: Row(
+                children: [
+                  SizedBox(width: screenWidth * 0.04), // Adjust as needed
+                  _buildHeaderCell('Patient Name'),
+                  SizedBox(width: screenWidth * 0.03), // Adjust as needed
+                  _buildHeaderCell('Report ID'),
+                  SizedBox(width: screenWidth * 0.05), // Adjust as needed
+                  _buildHeaderCell('Date'),
+                  SizedBox(width: screenWidth * 0.05), // Adjust as needed
+                  _buildHeaderCell('Payable Total'),
+                  SizedBox(width: screenWidth * 0.05), // Adjust as needed
+                  _buildHeaderCell('Paid'),
+                ],
+              ),
+            ),
+            // Divider
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // Margin for the divider
+              child: Divider(thickness: 1, color: Colors.black),
+            ),
+          ],
           // Space for displaying fetched data
           Expanded(
             child: reportViewModel.errorMessage.isNotEmpty
                 ? Center(child: Text(reportViewModel.errorMessage))
                 : reportViewModel.reportList.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No report data available',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: reportViewModel.reportList.length,
-                        itemBuilder: (context, index) {
-                          final report = reportViewModel.reportList[index];
+                ? Center(
+              child: Text(
+                'No report data available',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            )
+                : Padding(
+              padding: EdgeInsets.only(top: screenHeight * 0.005), // Set top padding to 0
+              child: ListView.builder(
+                padding: EdgeInsets.zero, // Ensure no additional padding at the top
+                physics: ClampingScrollPhysics(), // Prevent unwanted scroll behavior
+                itemCount: reportViewModel.reportList.length,
+                itemBuilder: (context, index) {
+                  final report = reportViewModel.reportList[index];
 
-                          // Calculate total = estimatedTotal * discount
-                          double total = double.parse(report.estimatedTotal) *
-                              (1 - double.parse(report.discount) / 100);
+                  // Calculate total = estimatedTotal * discount
+                  double total = double.parse(report.estimatedTotal) *
+                      (1 - double.parse(report.discount) / 100);
 
-                          // Calculate due = total - paidAmount
-                          double due = total - double.parse(report.paidAmount);
+                  // Calculate due = total - paidAmount
+                  double due = total - double.parse(report.paidAmount);
 
-                          // Default background color based on index
-                          Color backgroundColor = index % 2 == 0
-                              ? AppColors.row_havy_blue
-                              : AppColors.row_light_blue;
+                  // Default background color based on index
+                  Color backgroundColor = index % 2 == 0
+                      ? AppColors.row_havy_blue
+                      : AppColors.row_light_blue;
 
-                          // Check if due amount is greater than 10
-                          if (due > 10) {
-                            backgroundColor = Colors.red;
-                          } else if (report.testReportStatus != null) {
-                            // Only check testReportStatus if backgroundColor is not already red
-                            report.testReportStatus.forEach((testId, status) {
-                              if (status == "0") {
-                                backgroundColor = Colors.yellow;
-                              }
-                            });
-                          }
+                  // Check if due amount is greater than 10
+                  if (due > 10) {
+                    backgroundColor = Colors.red;
+                  } else if (report.testReportStatus != null) {
+                    // Only check testReportStatus if backgroundColor is not already red
+                    report.testReportStatus.forEach((testId, status) {
+                      if (status == "0") {
+                        backgroundColor = Colors.yellow;
+                      }
+                    });
+                  }
 
-                          return ReportListDataRow(
-                            name: report.patientName,
-                            reportId: report.reportId,
-                            date: report.entryDate,
-                            estimatedTotal: report.estimatedTotal,
-                            discount: report.discount,
-                            paidAmount: report.paidAmount,
-                            backgroundColor: backgroundColor,
-                          );
-                        },
-                      ),
-          ),
+                  return ReportListDataRow(
+                    name: report.patientName,
+                    reportId: report.reportId,
+                    date: report.entryDate,
+                    estimatedTotal: report.estimatedTotal,
+                    discount: report.discount,
+                    paidAmount: report.paidAmount,
+                    backgroundColor: backgroundColor,
+                    patientId: report.patientId,
+                  );
+                },
+              ),
+            ),
+          )
+
+
         ],
       ),
     );
@@ -436,5 +472,17 @@ class _ReportListPageState extends State<ReportListPage> {
       selectedDate = null;
       selectedWeek = null;
     });
+  }
+  Widget _buildHeaderCell(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+        fontSize: 12,
+        fontFamily: 'Roboto Slab',
+      ),
+      textAlign: TextAlign.center,
+    );
   }
 }

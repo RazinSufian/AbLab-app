@@ -1,5 +1,6 @@
 import 'package:ab_lab_app/routes/routes_name.dart';
 import 'package:ab_lab_app/view/menu_view.dart';
+import 'package:ab_lab_app/view/report_list_viwes/report_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -33,6 +34,8 @@ class Routes {
     return PageTransition(type: PageTransitionType.rightToLeft, child: TestsPage());
     case RoutesName.settings:
     return PageTransition(type: PageTransitionType.rightToLeft, child: SettingsPage());
+    case RoutesName.report_details_view:
+    return PageTransition(type: PageTransitionType.rightToLeft, child: ReportView());
 
 
       default:

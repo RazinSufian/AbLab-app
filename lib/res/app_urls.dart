@@ -11,6 +11,7 @@ class AppUrl {
 
   static var reportMonthlySummary =  baseUrl + '/report_list';
   static var reportListEndpoint = baseUrl + '/report_list';
+  static var reportDetailsEndpoint = baseUrl + '/report_details';
 
 
 }

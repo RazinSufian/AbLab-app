@@ -1,7 +1,7 @@
 import 'package:ab_lab_app/res/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../utils/components/sales_row_widget.dart'; // Make sure to use the correct path
+import 'sales_row_widget.dart'; // Make sure to use the correct path
 import '../../view_model/sales_view_model.dart';
 import '../../utils/components/commonHeader.dart';
 import '../../utils/utils.dart'; // Import Utils for custom loading

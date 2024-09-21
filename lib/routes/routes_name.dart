@@ -8,6 +8,7 @@ class RoutesName {
   static const String patientEntry = 'patient_entry_view' ;
   static const String tests = 'tests_view' ;
   static const String settings = 'settings_view' ;
+  static const String report_details_view = 'report_view' ;
 
   //accounts routes name
 
