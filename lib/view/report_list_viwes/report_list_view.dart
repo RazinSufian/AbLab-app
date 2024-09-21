@@ -132,7 +132,7 @@ class _ReportListPageState extends State<ReportListPage> {
           // Labels for report status
           Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                 EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: screenHeight * 0.00),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -144,7 +144,7 @@ class _ReportListPageState extends State<ReportListPage> {
                     Text('Unpaid Reports', style: TextStyle(fontSize: 14)),
                   ],
                 ),
-                SizedBox(width: 20),
+                SizedBox(width: screenWidth * 0.05),
                 Row(
                   children: [
                     Container(width: 10, height: 10, color: Colors.yellow),

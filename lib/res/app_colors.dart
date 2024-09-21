@@ -25,6 +25,7 @@ class AppColors{
   static const row_havy_blue = const Color(0xFFD7E3FC);
   static const row_light_blue = const Color(0xFFABC4FF);
   static const grayLineColor = const Color(0xFF919191);
+  static const buttonBorder = const Color(0xFF4D5AAF);
 
 
 
