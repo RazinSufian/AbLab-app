@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../view_model/report_details_view_model.dart'; // Import your view model
-import '../../routes/routes_name.dart'; // Make sure to import your routes
-import '../../utils/utils.dart'; // Import your loading utility
+import 'package:get/get.dart';
+import '../../controller/report_details_controller.dart';
+import '../../routes/routes_name.dart'; // Import routes
 
 class ReportListDataRow extends StatelessWidget {
   final String name;
@@ -38,18 +37,12 @@ class ReportListDataRow extends StatelessWidget {
     final shortName = name.length > 9 ? '${name.substring(0, 8)}..' : name;
 
     return GestureDetector(
-      onTap: () async {
-        // Show loading dialog
-        Utils.showLoading(context);
+      onTap: () {
+        // Set the report and patient ID in the GetX controller
+        final reportController = Get.put(ReportController());
+        reportController.setReportDetails(reportId, patientId);
 
-        // Call API and navigate to TestsPage
-        final reportDetailsViewModel = Provider.of<ReportDetailsViewModel>(context, listen: false);
-        await reportDetailsViewModel.fetchReportDetails(reportId, patientId);
-
-        // Close the loading dialog
-        Utils.cancelLoading(context);
-
-        // Navigate to TestsPage
+        // Navigate to ReportView without making an API call
         Navigator.pushNamed(context, RoutesName.report_details_view);
       },
       child: Container(
@@ -79,6 +72,7 @@ class ReportListDataRow extends StatelessWidget {
     );
   }
 
+  // Helper function to build individual data cells
   Widget _buildDataCell(String value, {bool alignLeft = false}) {
     return Expanded(
       child: Text(
@@ -89,6 +83,7 @@ class ReportListDataRow extends StatelessWidget {
     );
   }
 
+  // Function to format the date to show only the day
   String _formatDate(String date) {
     final parts = date.split('-');
     if (parts.length == 3) {

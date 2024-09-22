@@ -52,13 +52,13 @@ class TestReportContainer extends StatelessWidget {
 
           // Test Name with fixed width
           SizedBox(
-            width: screenWidth * 0.3, // Allocate 40% of the screen width
+            width: screenWidth * 0.29, // Allocate 40% of the screen width
             child: _buildDataCell(testName),
           ),
 
           // Test ID with fixed width
           SizedBox(
-            width: screenWidth * 0.17, // Allocate 25% of the screen width
+            width: screenWidth * 0.18, // Allocate 25% of the screen width
             child: _buildDataCell(testId),
           ),
 

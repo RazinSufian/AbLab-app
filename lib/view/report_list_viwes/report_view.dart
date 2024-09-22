@@ -1,14 +1,44 @@
 import 'package:ab_lab_app/res/app_colors.dart';
+import 'package:ab_lab_app/view/report_list_viwes/reportView_container.dart';
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:provider/provider.dart'; // Make sure to include provider for state management
+import '../../controller/report_details_controller.dart';
 import '../../utils/components/commonHeader.dart';
 import '../../utils/components/customButton.dart';
-import 'reportView_container.dart';
 
-class ReportView extends StatelessWidget {
+import '../../view_model/report_details_view_model.dart'; // Import your view model
+
+class ReportView extends StatefulWidget {
+  @override
+  _ReportViewState createState() => _ReportViewState();
+}
+
+class _ReportViewState extends State<ReportView> {
+  final reportController = Get.put(ReportController());
+  late ReportDetailsViewModel reportDetailsViewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    reportDetailsViewModel = Provider.of<ReportDetailsViewModel>(context, listen: false);
+
+    // Schedule the API call to run after the build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchReportDetails();
+    });
+  }
+
+  void fetchReportDetails() {
+    reportDetailsViewModel.fetchReportDetails(
+      reportController.reportId.value,
+      reportController.patientId.value,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // MediaQuery to get screen width and height
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -22,226 +52,208 @@ class ReportView extends StatelessWidget {
               Navigator.of(context).pop();
             },
           ),
-          Expanded( // Use Expanded to ensure body takes remaining space
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Patient Information Section
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Expanded(
+            child: Consumer<ReportDetailsViewModel>(
+              builder: (context, reportDetailsViewModel, child) {
+                if (reportDetailsViewModel.isLoading) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (reportDetailsViewModel.errorMessage.isNotEmpty) {
+                  return Center(child: Text(reportDetailsViewModel.errorMessage));
+                }
+
+                final reportDetails = reportDetailsViewModel.reportDetails;
+
+                if (reportDetails == null) {
+                  return Center(child: Text("No report details available."));
+                }
+
+                // Getting the patient and report data
+                final patient = reportDetails.patient;
+                final report = reportDetails.report;
+
+                // Getting the billInformations (for table) and testes_informations (for TestReportContainer)
+                final billInformations = report.billInformations;
+                final testesInformations = reportDetails.testesInformations;
+
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      // Patient Information Section (can be kept static or dynamic if needed)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Patient Information', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab", fontSize: 15)),
-                          SizedBox(height: screenHeight * 0.01),
-                          Text('Patient ID: 22123123'),
-                          Text('Name:'),
-                          Text('Age:'),
-                          Text('Address:'),
-                          Text('Phone:'),
-                          Text('Gender:'),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Report Information:', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab", fontSize: 15)),
-                          SizedBox(height: screenHeight * 0.01),
-                          Text('Report ID:'),
-                          Text('Biller Name:'),
-                          Text('Billing Date:'),
-                          Text('Billing Time:'),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  // Download Bill Button
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: CustomButton(
-                      text: 'Download Bill',
-                      onPressed: () {
-                        // Implement the download bill action
-                      },
-                      backgroundColor: AppColors.skyBGColor,
-                      textColor: Colors.white,
-                      borderColor: AppColors.buttonBorder,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  // Tests Table within a gray container
-                  Container(
-                    color: Colors.grey[350]!,
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black, width: 1),
-                          ),
-                          child: Column(
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Table(
-                                border: TableBorder(
-                                  bottom: BorderSide(width: 1, color: Colors.black),
-                                  verticalInside: BorderSide(width: 1, color: Colors.black),
-                                ),
-                                columnWidths: {
-                                  0: FlexColumnWidth(0.15),
-                                  1: FlexColumnWidth(0.6),
-                                  2: FlexColumnWidth(0.3),
-                                },
+                              Text('Patient Information', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab", fontSize: 15)),
+                              SizedBox(height: screenHeight * 0.01),
+                              Text('Patient ID: ${patient.patientId}'),
+                              Text('Name: ${patient.name}'),
+                              Text('Age: ${patient.age}'),
+                              Text('Address: ${patient.address}'),
+                              Text('Phone: ${patient.phone}'),
+                              Text('Gender: ${patient.gender}'),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Report Information:', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab", fontSize: 15)),
+                              SizedBox(height: screenHeight * 0.01),
+                              Text('Report ID: ${report.reportId}'),
+                              Text('Biller Name: ${report.billerName}'),
+                              Text('Billing Date: ${report.entryDate}'),
+                              Text('Billing Time: ${report.entryTime}'),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      // Download Bill Button
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: CustomButton(
+                          text: 'Download Bill',
+                          onPressed: () {
+                            // Implement the download bill action
+                          },
+                          backgroundColor: AppColors.skyBGColor,
+                          textColor: Colors.white,
+                          borderColor: AppColors.buttonBorder,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      // Dynamic Tests Table (using billInformations)
+                      Container(
+                        color: Colors.grey[350]!,
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black, width: 1),
+                              ),
+                              child: Column(
                                 children: [
-                                  TableRow(
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(color: Colors.black, width: 1),
-                                      ),
+                                  Table(
+                                    border: TableBorder(
+                                      bottom: BorderSide(width: 1, color: Colors.black),
+                                      verticalInside: BorderSide(width: 1, color: Colors.black),
                                     ),
+                                    columnWidths: {
+                                      0: FlexColumnWidth(0.15),
+                                      1: FlexColumnWidth(0.6),
+                                      2: FlexColumnWidth(0.3),
+                                    },
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text('No', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab")),
+                                      TableRow(
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(color: Colors.black, width: 1),
+                                          ),
+                                        ),
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text('No', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab")),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text('Test Name', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab")),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab")),
+                                          ),
+                                        ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text('Test Name', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab")),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab")),
-                                      ),
+                                      // Dynamically build table rows from billInformations
+                                      for (var i = 0; i < billInformations.length; i++)
+                                        _buildTableRow(i + 1, billInformations.keys.elementAt(i), billInformations.values.elementAt(i)),
                                     ],
                                   ),
-                                  _buildTableRow(1, 'Red Blood Cell', '2000'),
-                                  TableRow(children: [SizedBox(height: 8), SizedBox(height: 8), SizedBox(height: 8)]), // Spacer row
-                                  _buildTableRow(2, 'White Blood Cell', '3000'),
-                                  TableRow(children: [SizedBox(height: 8), SizedBox(height: 8), SizedBox(height: 8)]), // Spacer row
-                                  _buildTableRow(3, 'Blood Platelets', '2000'),
                                 ],
                               ),
-                              // Summary Section within gray container
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text('Grand Total: 7000'),
-                                      Text('Discount %: 25%'),
-                                      Text('Total Payable: 5250'),
-                                      Text('Paid Amount: 3750'),
-                                      Text('Due Amount: 1500'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  // Center the Test Reports Section
-                  Align(
-                    alignment: Alignment.center,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(height: screenHeight * 0.02),
-                        Text('Test Reports', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Roboto Slab')),
-                        SizedBox(height: screenHeight * 0.03),
-                        // Header Row
-                        Padding(
-                          padding: EdgeInsets.only(left: screenWidth * 0.0),
-                          child: Row(
-                            children: [
-                              SizedBox(width: screenWidth * 0.13),
-                              _buildHeaderCell('Test Name'),
-                              SizedBox(width: screenWidth * 0.12),
-                              _buildHeaderCell('Test ID'),
-                              SizedBox(width: screenWidth * 0.07),
-                              _buildHeaderCell('Reported By'),
-                              Container(), // Placeholder for status bullet
-                            ],
-                          ),
-                        ),
-                        Divider(thickness: 1, color: Colors.black),
-                        // Test Report Containers
-                        TestReportContainer(
-                          testName: 'RBC',
-                          testId: 'A#3005',
-                          reporter: 'doctor name',
-                          status: 'complete',
-                          onViewPressed: () {
-                            // View action
-                          },
-                        ),
-                        TestReportContainer(
-                          testName: 'WBC',
-                          testId: 'B#3005',
-                          reporter: 'doctor name',
-                          status: 'draft',
-                          onViewPressed: () {
-                            // View action
-                          },
-                        ),
-                        TestReportContainer(
-                          testName: 'PLTdsfsdfdsf sadfsafsaasdasdsadsa sda',
-                          testId: 'P#3005',
-                          reporter: 'doctor namesadasdasdsad',
-                          status: 'incomplete',
-                          onViewPressed: () {
-                            // View action
-                          },
-                        ),
-                        SizedBox(height: screenHeight * 0.02),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                      ),
+                      SizedBox(height: 16),
+                      // Center the Test Reports Section
+                      Align(
+                        alignment: Alignment.center,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Row(
-                              children: [
-                                Container(width: 10, height: 10, color: Colors.red),
-                                SizedBox(width: 5),
-                                Text('Report Incomplete', style: TextStyle(fontSize: 12)),
-                              ],
+                            SizedBox(height: screenHeight * 0.02),
+                            Text('Test Reports', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Roboto Slab')),
+                            SizedBox(height: screenHeight * 0.03),
+                            // Header Row
+                            Padding(
+                              padding: EdgeInsets.only(left: screenWidth * 0.0),
+                              child: Row(
+                                children: [
+                                  SizedBox(width: screenWidth * 0.13),
+                                  _buildHeaderCell('Test Name'),
+                                  SizedBox(width: screenWidth * 0.12),
+                                  _buildHeaderCell('Test ID'),
+                                  SizedBox(width: screenWidth * 0.07),
+                                  _buildHeaderCell('Reported By'),
+                                  Container(), // Placeholder for status bullet
+                                ],
+                              ),
                             ),
-                            SizedBox(width: screenWidth * 0.011),
+                            Divider(thickness: 1, color: Colors.black),
+                            // Dynamically build TestReportContainers from testesInformations
+                            for (var testId in testesInformations.keys)
+                              TestReportContainer(
+                                testName: _getTestName(testId), // Based on prefix logic
+                                testId: testId,
+                                reporter: testesInformations[testId]?.reportBy ?? "N/A",
+                                status: _getStatus(testesInformations[testId]?.reportStatus),
+                                onViewPressed: () {
+                                  // Implement view action
+                                },
+                              ),
+                            SizedBox(height: screenHeight * 0.02),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Container(width: 10, height: 10, color: Colors.yellow),
-                                SizedBox(width: 5),
-                                Text('Report Draft', style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                            SizedBox(width: screenWidth * 0.011),
-                            Row(
-                              children: [
-                                Container(width: 10, height: 10, color: Colors.green),
-                                SizedBox(width: 5),
-                                Text('Report Complete', style: TextStyle(fontSize: 12, fontFamily: 'Roboto Slab')),
+                                Row(
+                                  children: [
+                                    Container(width: 10, height: 10, color: Colors.red),
+                                    SizedBox(width: 5),
+                                    Text('Report Incomplete', style: TextStyle(fontSize: 12)),
+                                  ],
+                                ),
+                                SizedBox(width: screenWidth * 0.011),
+                                Row(
+                                  children: [
+                                    Container(width: 10, height: 10, color: Colors.yellow),
+                                    SizedBox(width: 5),
+                                    Text('Report Draft', style: TextStyle(fontSize: 12)),
+                                  ],
+                                ),
+                                SizedBox(width: screenWidth * 0.011),
+                                Row(
+                                  children: [
+                                    Container(width: 10, height: 10, color: Colors.green),
+                                    SizedBox(width: 5),
+                                    Text('Report Complete', style: TextStyle(fontSize: 12, fontFamily: 'Roboto Slab')),
+                                  ],
+                                ),
                               ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  // Action Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // CustomButton implementations can go here
+                      ),
                     ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -249,6 +261,39 @@ class ReportView extends StatelessWidget {
     );
   }
 
+  // Helper method to get status based on report_status
+  String _getStatus(String? reportStatus) {
+    if (reportStatus == "1") return "Complete";
+    if (reportStatus == "2") return "Draft";
+    return "Incomplete";
+  }
+
+  // Helper method to get test name based on the testId prefix
+  String _getTestName(String testId) {
+    String prefix = testId.substring(0, 2);
+    switch (prefix) {
+      case "PS":
+        return "Pap's Smear";
+      case "FN":
+        return "FNAC";
+      case "SB":
+        return "Skin Biopsy";
+      case "SA":
+        return "Semen Analysis";
+      case "FA":
+        return "Fluid Analysis";
+      case "NB":
+        return "Needle Core Biopsy";
+      case "HB":
+        return "Histopathology/Biopsy";
+      case "FC":
+        return "Fungus/Cytology";
+      default:
+        return "Unknown Test";
+    }
+  }
+
+  // Dynamic table row builder
   TableRow _buildTableRow(int no, String testName, String amount) {
     return TableRow(
       children: [
@@ -267,7 +312,6 @@ class ReportView extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildHeaderCell(String title) {
     return Text(
       title,

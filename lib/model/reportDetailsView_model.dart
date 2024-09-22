@@ -44,6 +44,10 @@ class Report {
   String paidAmount;
   String estimatedTotal;
   String reportId;
+  String billerName;
+  String entryTime;
+  Map<String, String> testReportStatus;
+  Map<String, String> billInformations;
 
   Report({
     required this.referredTo,
@@ -53,6 +57,10 @@ class Report {
     required this.paidAmount,
     required this.estimatedTotal,
     required this.reportId,
+    required this.billerName,
+    required this.entryTime,
+    required this.testReportStatus,
+    required this.billInformations,
   });
 
   factory Report.fromJson(Map<String, dynamic> json) {
@@ -64,6 +72,27 @@ class Report {
       paidAmount: json['paid_amount'],
       estimatedTotal: json['estimated_total'],
       reportId: json['report_id'],
+      billerName: json['biller_name'],
+      entryTime: json['entry_time'],
+      testReportStatus: Map<String, String>.from(json['test_report_status']),
+      billInformations: Map<String, String>.from(json['bill_informations']),
+    );
+  }
+}
+
+class TestInformation {
+  String reportStatus;
+  String reportBy;
+
+  TestInformation({
+    required this.reportStatus,
+    required this.reportBy,
+  });
+
+  factory TestInformation.fromJson(Map<String, dynamic> json) {
+    return TestInformation(
+      reportStatus: json['report_status'],
+      reportBy: json['report_by'],
     );
   }
 }
@@ -71,13 +100,27 @@ class Report {
 class ReportDetails {
   Patient patient;
   Report report;
+  Map<String, TestInformation> testesInformations;
 
-  ReportDetails({required this.patient, required this.report});
+  ReportDetails({
+    required this.patient,
+    required this.report,
+    required this.testesInformations,
+  });
 
   factory ReportDetails.fromJson(Map<String, dynamic> json) {
+    // Parsing testes_informations
+    Map<String, TestInformation> testesInformations = {};
+    if (json['body']['testes_informations'] != null) {
+      json['body']['testes_informations'].forEach((key, value) {
+        testesInformations[key] = TestInformation.fromJson(value);
+      });
+    }
+
     return ReportDetails(
       patient: Patient.fromJson(json['body']['patient']),
       report: Report.fromJson(json['body']['report']),
+      testesInformations: testesInformations,
     );
   }
 }

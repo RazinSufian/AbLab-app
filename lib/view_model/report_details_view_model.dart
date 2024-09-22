@@ -4,7 +4,7 @@ import '../model/reportDetailsView_model.dart';
 import '../repository/report_details_repository.dart';
 
 class ReportDetailsViewModel extends ChangeNotifier {
-  final ReportDetailsRepository _repository = ReportDetailsRepository();
+  final _reportDetailsRepository = ReportDetailsRepository();
   ReportDetails? reportDetails;
   bool isLoading = false;
   String errorMessage = '';
@@ -15,7 +15,8 @@ class ReportDetailsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      reportDetails = await _repository.fetchReportDetails(reportId, patientId);
+      print("tring to make api call in repo");
+      reportDetails = await _reportDetailsRepository.fetchReportDetails(reportId, patientId);
     } catch (error) {
       errorMessage = error.toString();
     } finally {

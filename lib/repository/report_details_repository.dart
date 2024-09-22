@@ -1,18 +1,19 @@
+// repository/report_details_repository.dart
+
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../model/reportDetailsView_model.dart';
-import '../data/network/BaseApiServices.dart';
-import '../data/network/NetworkApiServices.dart';
 import '../res/app_urls.dart';
 
 class ReportDetailsRepository {
-  final BaseApiServices _apiServices = NetworkApiService();
-
   Future<ReportDetails> fetchReportDetails(String reportId, String patientId) async {
-    try {
-      String url = '${AppUrl.reportDetailsEndpoint}?report_id=$reportId&patient_id=$patientId';
-      final response = await _apiServices.getGetApiResponse(url);
-      return ReportDetails.fromJson(response);
-    } catch (e) {
-      throw e;
+    print("tring to make api call in repo");
+    final response = await http.get(Uri.parse('${AppUrl.reportDetailsEndpoint}?report_id=$reportId&patient_id=$patientId'));
+
+    if (response.statusCode == 200) {
+      return ReportDetails.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load report details');
     }
   }
 }
