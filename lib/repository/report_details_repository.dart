@@ -2,7 +2,8 @@
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../model/reportDetailsView_model.dart';
+
+import '../model/reportDetails_model.dart';
 import '../res/app_urls.dart';
 
 class ReportDetailsRepository {

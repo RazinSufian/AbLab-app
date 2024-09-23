@@ -2,13 +2,13 @@ import 'package:ab_lab_app/res/app_colors.dart';
 import 'package:ab_lab_app/view/report_list_viwes/reportView_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:provider/provider.dart'; // Make sure to include provider for state management
 import '../../controller/report_details_controller.dart';
 import '../../utils/components/commonHeader.dart';
 import '../../utils/components/customButton.dart';
 
-import '../../view_model/report_details_view_model.dart'; // Import your view model
+import '../../view_model/report_details_view_model.dart';
+import 'downloadBillPdf.dart'; // Import your view model
 
 class ReportView extends StatefulWidget {
   @override
@@ -32,6 +32,7 @@ class _ReportViewState extends State<ReportView> {
 
   void fetchReportDetails() {
     reportDetailsViewModel.fetchReportDetails(
+      context,
       reportController.reportId.value,
       reportController.patientId.value,
     );
@@ -55,10 +56,6 @@ class _ReportViewState extends State<ReportView> {
           Expanded(
             child: Consumer<ReportDetailsViewModel>(
               builder: (context, reportDetailsViewModel, child) {
-                if (reportDetailsViewModel.isLoading) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
                 if (reportDetailsViewModel.errorMessage.isNotEmpty) {
                   return Center(child: Text(reportDetailsViewModel.errorMessage));
                 }
@@ -119,7 +116,7 @@ class _ReportViewState extends State<ReportView> {
                         child: CustomButton(
                           text: 'Download Bill',
                           onPressed: () {
-                            // Implement the download bill action
+                            downloadBillPdf(context, reportDetailsViewModel);
                           },
                           backgroundColor: AppColors.skyBGColor,
                           textColor: Colors.white,
@@ -174,6 +171,23 @@ class _ReportViewState extends State<ReportView> {
                                       for (var i = 0; i < billInformations.length; i++)
                                         _buildTableRow(i + 1, billInformations.keys.elementAt(i), billInformations.values.elementAt(i)),
                                     ],
+                                  ),
+                                  // Summary Section within gray container
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Text('Grand Total: ${report.estimatedTotal}'),
+                                          Text('Discount %: ${report.discount}'),
+                                          Text('Total Payable: ${(int.parse(report.estimatedTotal) * (1 - (int.parse(report.discount) / 100))).toStringAsFixed(2)}'),
+                                          Text('Paid Amount: ${report.paidAmount}'),
+                                          Text('Due Amount: ${(int.parse(report.estimatedTotal) * (1 - (int.parse(report.discount) / 100)) - int.parse(report.paidAmount)).toStringAsFixed(2)}'),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -312,6 +326,7 @@ class _ReportViewState extends State<ReportView> {
       ],
     );
   }
+
   Widget _buildHeaderCell(String title) {
     return Text(
       title,
