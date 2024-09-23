@@ -29,7 +29,7 @@ Future<Map<String, dynamic>> downloadPdf(BuildContext context, File generatedFil
     await tempFile.delete();
 
     // Navigate back to the previous screen
-    Navigator.pop(context);
+    // Navigator.pop(context);
 
     return {'status': 1, 'message': ''};  // No error, return empty message
   } catch (e) {

@@ -4,17 +4,32 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_native_html_to_pdf/flutter_native_html_to_pdf.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../utils/components/pdfDownloader.dart';
+import '../../utils/utils.dart';
 import '../../view_model/report_details_view_model.dart'; // Assuming this is your ViewModel
 
 // This function generates the PDF and then triggers the download
 Future<void> downloadBillPdf(BuildContext context, ReportDetailsViewModel viewModel) async {
-  final generatedFile = await generateBillPdf(viewModel);
-  if (generatedFile != null) {
-    await downloadPdf(context, generatedFile, 'patient_bill_report');
-  } else {
-    print('PDF generation failed');
+  try {
+    // Show the loading indicator before generating the PDF
+     Utils.showLoading(context);
+
+    // Generate the PDF
+    final generatedFile = await generateBillPdf(viewModel);
+
+    if (generatedFile != null) {
+      Utils.cancelLoading(context);
+      // Download the generated PDF
+      await downloadPdf(context, generatedFile, 'patient_bill_report');
+    } else {
+      print('PDF generation failed');
+    }
+  } finally {
+    // Always hide the loading indicator, whether success or failure
+    print('PDF download complete');
+
   }
 }
+
 
 // Helper function to create and generate the PDF
 Future<File?> generateBillPdf(ReportDetailsViewModel viewModel) async {
