@@ -39,11 +39,11 @@ Future<File?> generateBillPdf(ReportDetailsViewModel viewModel) async {
     final billInformations = report?.billInformations ?? {};
 
     // Calculate total payable and due amounts based on the logic you provided
-    final totalPayable = (int.parse(report?.estimatedTotal ?? '0') *
-        (1 - (int.parse(report?.discount ?? '0') / 100))).toStringAsFixed(2);
-    final dueAmount = (int.parse(report?.estimatedTotal ?? '0') *
-        (1 - (int.parse(report?.discount ?? '0') / 100)) -
-        int.parse(report?.paidAmount ?? '0')).toStringAsFixed(2);
+    final totalPayable = (double.parse(report?.estimatedTotal ?? '0') *
+        (1 - (double.parse(report?.discount ?? '0') / 100))).toStringAsFixed(2);
+    final dueAmount = (double.parse(report?.estimatedTotal ?? '0') *
+        (1 - (double.parse(report?.discount ?? '0') / 100)) -
+        double.parse(report?.paidAmount ?? '0')).toStringAsFixed(2);
 
     // Basic black and white CSS
     final css = """

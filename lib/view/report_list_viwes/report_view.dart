@@ -83,32 +83,213 @@ class _ReportViewState extends State<ReportView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Patient Information', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab", fontSize: 15)),
-                              SizedBox(height: screenHeight * 0.01),
-                              Text('Patient ID: ${patient.patientId}'),
-                              Text('Name: ${patient.name}'),
-                              Text('Age: ${patient.age}'),
-                              Text('Address: ${patient.address}'),
-                              Text('Phone: ${patient.phone}'),
-                              Text('Gender: ${patient.gender}'),
-                            ],
+                          Flexible(
+                            flex: 5,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Patient Information', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab", fontSize: 16)),
+                                SizedBox(height: screenHeight * 0.02),
+                                Container(
+                                  width: double.infinity,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Patient ID: ',
+                                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black, fontSize: 14),
+                                        ),
+                                        TextSpan(
+                                          text: patient.patientId, // Dynamic data
+                                          style: TextStyle(color: Colors.black), // Default styling for dynamic data
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Name: ',
+                                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black, fontSize: 14),
+                                        ),
+                                        TextSpan(
+                                          text: patient.name,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Age: ',
+                                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black, fontSize: 14),
+                                        ),
+                                        TextSpan(
+                                          text: patient.age,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Address: ',
+                                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black, fontSize: 14),
+                                        ),
+                                        TextSpan(
+                                          text: patient.address,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Phone: ',
+                                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black, fontSize: 14),
+                                        ),
+                                        TextSpan(
+                                          text: patient.phone,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Gender: ',
+                                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black, fontSize: 14),
+                                        ),
+                                        TextSpan(
+                                          text: patient.gender,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Report Information:', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab", fontSize: 15)),
-                              SizedBox(height: screenHeight * 0.01),
-                              Text('Report ID: ${report.reportId}'),
-                              Text('Biller Name: ${report.billerName}'),
-                              Text('Billing Date: ${report.entryDate}'),
-                              Text('Billing Time: ${report.entryTime}'),
-                            ],
+                          SizedBox(width: 16), // Add space between the columns
+                          Flexible(
+                            flex: 4,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Report Information:', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Roboto Slab", fontSize: 15)),
+                                SizedBox(height: screenHeight * 0.02),
+                                Container(
+                                  width: double.infinity,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Report ID: ',
+                                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black, fontSize: 14),
+                                        ),
+                                        TextSpan(
+                                          text: report.reportId,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Biller Name: ',
+                                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black, fontSize: 14),
+                                        ),
+                                        TextSpan(
+                                          text: report.billerName,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Billing Date: ',
+                                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black, fontSize: 14),
+                                        ),
+                                        TextSpan(
+                                          text: formatDate(report.entryDate),
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Billing Time: ',
+                                          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black, fontSize: 14),
+                                        ),
+                                        TextSpan(
+                                          text: report.entryTime,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
+
+
+
+
                       SizedBox(height: 16),
                       // Download Bill Button
                       Align(
@@ -182,9 +363,9 @@ class _ReportViewState extends State<ReportView> {
                                         children: [
                                           Text('Grand Total: ${report.estimatedTotal}'),
                                           Text('Discount %: ${report.discount}'),
-                                          Text('Total Payable: ${(int.parse(report.estimatedTotal) * (1 - (int.parse(report.discount) / 100))).toStringAsFixed(2)}'),
+                                          Text('Total Payable: ${(double.parse(report.estimatedTotal) * (1 - (double.parse(report.discount) / 100))).toStringAsFixed(2)}'),
                                           Text('Paid Amount: ${report.paidAmount}'),
-                                          Text('Due Amount: ${(int.parse(report.estimatedTotal) * (1 - (int.parse(report.discount) / 100)) - int.parse(report.paidAmount)).toStringAsFixed(2)}'),
+                                          Text('Due Amount: ${(double.parse(report.estimatedTotal) * (1 - (double.parse(report.discount) / 100)) - double.parse(report.paidAmount)).toStringAsFixed(2)}'),
                                         ],
                                       ),
                                     ),
@@ -326,6 +507,15 @@ class _ReportViewState extends State<ReportView> {
       ],
     );
   }
+
+  String formatDate(String date) {
+    List<String> dateParts = date.split('-'); // Split the date string by '-'
+    String year = dateParts[0].substring(2);  // Take the last two digits of the year
+    String month = dateParts[1];              // Get the month
+    String day = dateParts[2];                // Get the day
+    return '$day-$month-$year';               // Return in dd-mm-yy format
+  }
+
 
   Widget _buildHeaderCell(String title) {
     return Text(
