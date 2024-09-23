@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
+import '../../controller/reportListController.dart';
 import '../../utils/components/commonHeader.dart';
 import '../../utils/components/customPicker.dart';
 import 'report_row_widget.dart';
@@ -8,13 +10,14 @@ import '../../view_model/report_list_view_model.dart';
 import '../../res/image_assets.dart';
 import '../../res/app_colors.dart';
 
+
 class ReportListPage extends StatefulWidget {
   @override
   _ReportListPageState createState() => _ReportListPageState();
 }
 
 class _ReportListPageState extends State<ReportListPage> {
-  String? selectedQuery;
+  final ReportListController _reportListController = Get.put(ReportListController()); // Initialize controller
   String? selectedWeek;
   DateTime? selectedDate;
   DateTime? rangeStartDate;
@@ -37,7 +40,7 @@ class _ReportListPageState extends State<ReportListPage> {
     'December'
   ];
   final List<String> years = List.generate(2044 - DateTime.now().year + 1,
-      (index) => (DateTime.now().year + index).toString());
+          (index) => (DateTime.now().year + index).toString());
 
   String? selectedMonth;
   String? selectedYear;
@@ -54,9 +57,9 @@ class _ReportListPageState extends State<ReportListPage> {
     // Update day_range based on current month and year
     _updateDayRange();
 
-    // Clear selectedQuery if not in month selection mode
+    // Clear QuaryController if not in month selection mode
     if (!searchByMonth) {
-      selectedQuery = '';
+      _reportListController.QuaryController = '';
     }
   }
 
@@ -78,7 +81,7 @@ class _ReportListPageState extends State<ReportListPage> {
           ),
           Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -95,9 +98,7 @@ class _ReportListPageState extends State<ReportListPage> {
                       onChanged: (value) {
                         _toggleSearchByMonth(value);
                       },
-                      activeTrackColor: AppColors
-                          .skyBGColor, // Background color of the switch when it's on
-                      // activeColor: AppColors.skyBGColor,  // Thumb color when the switch is on
+                      activeTrackColor: AppColors.skyBGColor,
                     ),
                   ],
                 ),
@@ -115,7 +116,6 @@ class _ReportListPageState extends State<ReportListPage> {
               ],
             ),
           ),
-          // Fixed-size container for input options
           Container(
             height: screenHeight * 0.15, // Fixed height for the input container
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -124,7 +124,7 @@ class _ReportListPageState extends State<ReportListPage> {
                 Expanded(
                   flex: 1,
                   child:
-                      searchByMonth ? _buildMonthSearch() : _buildDateSearch(),
+                  searchByMonth ? _buildMonthSearch() : _buildDateSearch(),
                 ),
               ],
             ),
@@ -132,59 +132,60 @@ class _ReportListPageState extends State<ReportListPage> {
           // Labels for report status
           Padding(
             padding:
-                 EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: screenHeight * 0.00),
+            EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: screenHeight * 0.00),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Container(width: 10, height: 10, color: Colors.red),
-                    // Red dot
                     SizedBox(width: 5),
                     Text('Unpaid Reports', style: TextStyle(fontSize: 14)),
                   ],
                 ),
-                SizedBox(width: screenWidth * 0.05),
+                SizedBox(width: screenWidth * 0.02),
                 Row(
                   children: [
                     Container(width: 10, height: 10, color: Colors.yellow),
-                    // Yellow dot
                     SizedBox(width: 5),
                     Text('Report Incomplete', style: TextStyle(fontSize: 14)),
+                  ],
+                ),
+                SizedBox(width: screenWidth * 0.02),
+                Row(
+                  children: [
+                    Container(width: 10, height: 10, color: AppColors.skyBGColor),
+                    SizedBox(width: 5),
+                    Text('Done', style: TextStyle(fontSize: 14)),
                   ],
                 ),
               ],
             ),
           ),
-          // Add your new header row here
-          // Conditionally show the header row and divider
           if (reportViewModel.reportList.isNotEmpty) ...[
             SizedBox(height: screenHeight * 0.03),
-            // Header Row
             Padding(
               padding: EdgeInsets.only(left: screenWidth * 0.0),
               child: Row(
                 children: [
-                  SizedBox(width: screenWidth * 0.04), // Adjust as needed
+                  SizedBox(width: screenWidth * 0.04),
                   _buildHeaderCell('Patient Name'),
-                  SizedBox(width: screenWidth * 0.03), // Adjust as needed
+                  SizedBox(width: screenWidth * 0.03),
                   _buildHeaderCell('Report ID'),
-                  SizedBox(width: screenWidth * 0.05), // Adjust as needed
+                  SizedBox(width: screenWidth * 0.05),
                   _buildHeaderCell('Date'),
-                  SizedBox(width: screenWidth * 0.05), // Adjust as needed
+                  SizedBox(width: screenWidth * 0.05),
                   _buildHeaderCell('Payable Total'),
-                  SizedBox(width: screenWidth * 0.05), // Adjust as needed
+                  SizedBox(width: screenWidth * 0.05),
                   _buildHeaderCell('Paid'),
                 ],
               ),
             ),
-            // Divider
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // Margin for the divider
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
               child: Divider(thickness: 1, color: Colors.black),
             ),
           ],
-          // Space for displaying fetched data
           Expanded(
             child: reportViewModel.errorMessage.isNotEmpty
                 ? Center(child: Text(reportViewModel.errorMessage))
@@ -196,31 +197,23 @@ class _ReportListPageState extends State<ReportListPage> {
               ),
             )
                 : Padding(
-              padding: EdgeInsets.only(top: screenHeight * 0.005), // Set top padding to 0
+              padding: EdgeInsets.only(top: screenHeight * 0.005),
               child: ListView.builder(
-                padding: EdgeInsets.zero, // Ensure no additional padding at the top
-                physics: ClampingScrollPhysics(), // Prevent unwanted scroll behavior
+                padding: EdgeInsets.zero,
+                physics: ClampingScrollPhysics(),
                 itemCount: reportViewModel.reportList.length,
                 itemBuilder: (context, index) {
                   final report = reportViewModel.reportList[index];
-
-                  // Calculate total = estimatedTotal * discount
                   double total = double.parse(report.estimatedTotal) *
                       (1 - double.parse(report.discount) / 100);
-
-                  // Calculate due = total - paidAmount
                   double due = total - double.parse(report.paidAmount);
-
-                  // Default background color based on index
                   Color backgroundColor = index % 2 == 0
                       ? AppColors.row_havy_blue
                       : AppColors.row_light_blue;
 
-                  // Check if due amount is greater than 10
                   if (due > 10) {
                     backgroundColor = Colors.red;
                   } else if (report.testReportStatus != null) {
-                    // Only check testReportStatus if backgroundColor is not already red
                     report.testReportStatus.forEach((testId, status) {
                       if (status == "0") {
                         backgroundColor = Colors.yellow;
@@ -242,24 +235,19 @@ class _ReportListPageState extends State<ReportListPage> {
               ),
             ),
           )
-
-
         ],
       ),
     );
   }
 
-  // Date-based search UI
   Widget _buildDateSearch() {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
-    // Calculate the dates
     DateTime today = DateTime.now();
     DateTime yesterday = today.subtract(Duration(days: 1));
     DateTime dayBeforeYesterday = today.subtract(Duration(days: 2));
 
-    // Format the dates
     String todayString = 'day=${today.toIso8601String().split('T')[0]}';
     String yesterdayString = 'day=${yesterday.toIso8601String().split('T')[0]}';
     String dayBeforeYesterdayString =
@@ -267,7 +255,6 @@ class _ReportListPageState extends State<ReportListPage> {
 
     return Row(
       children: [
-        // CustomPicker for selecting the date
         Expanded(
           child: CustomPicker(
             title: "Date:",
@@ -287,9 +274,9 @@ class _ReportListPageState extends State<ReportListPage> {
               if (pickedDate != null) {
                 setState(() {
                   selectedDate = pickedDate;
-                  selectedQuery =
-                      'day=${pickedDate.toIso8601String().split('T')[0]}';
-                  selectedWeek = null; // Reset week selection
+                  _reportListController.QuaryController =
+                  'day=${pickedDate.toIso8601String().split('T')[0]}';
+                  selectedWeek = null;
                 });
               }
             },
@@ -297,15 +284,10 @@ class _ReportListPageState extends State<ReportListPage> {
           ),
         ),
         SizedBox(width: screenWidth * 0.05),
-        // Space between the CustomPicker and Dropdown
-
-        // Dropdown for selecting the week range
         DropdownButton<String>(
           hint: Text('Select',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
-          // Placeholder text
           value: selectedWeek,
-          // Default to null so it shows the hint
           items: [
             DropdownMenuItem(
               value: todayString,
@@ -336,8 +318,8 @@ class _ReportListPageState extends State<ReportListPage> {
           onChanged: (newValue) {
             setState(() {
               selectedWeek = newValue;
-              selectedQuery = newValue;
-              selectedDate = null; // Reset date selection
+              _reportListController.QuaryController = newValue!;
+              selectedDate = null;
             });
           },
         ),
@@ -345,7 +327,6 @@ class _ReportListPageState extends State<ReportListPage> {
     );
   }
 
-  // Month-based search UI
   Widget _buildMonthSearch() {
     return Row(
       children: [
@@ -357,7 +338,7 @@ class _ReportListPageState extends State<ReportListPage> {
                     fontSize: 15,
                     color: AppColors.blackColor,
                     fontWeight:
-                        FontWeight.w400)), // Apply custom styling to hint
+                    FontWeight.w400)),
             value: selectedMonth,
             items: months.map((String month) {
               return DropdownMenuItem<String>(
@@ -366,15 +347,14 @@ class _ReportListPageState extends State<ReportListPage> {
                   month,
                   style: TextStyle(
                       fontSize: 15,
-                      color: AppColors
-                          .blackColor), // Apply custom styling to items
+                      color: AppColors.blackColor),
                 ),
               );
             }).toList(),
             onChanged: (newValue) {
               setState(() {
                 selectedMonth = newValue;
-                _updateDayRange(); // Call function to update day_range
+                _updateDayRange();
               });
             },
           ),
@@ -388,7 +368,7 @@ class _ReportListPageState extends State<ReportListPage> {
                     fontSize: 15,
                     color: AppColors.blackColor,
                     fontWeight:
-                        FontWeight.w400)), // Apply custom styling to hint
+                    FontWeight.w400)),
             value: selectedYear,
             items: years.map((String year) {
               return DropdownMenuItem<String>(
@@ -397,15 +377,14 @@ class _ReportListPageState extends State<ReportListPage> {
                   year,
                   style: TextStyle(
                       fontSize: 15,
-                      color: AppColors
-                          .blackColor), // Apply custom styling to items
+                      color: AppColors.blackColor),
                 ),
               );
             }).toList(),
             onChanged: (newValue) {
               setState(() {
                 selectedYear = newValue;
-                _updateDayRange(); // Call function to update day_range
+                _updateDayRange();
               });
             },
           ),
@@ -414,65 +393,54 @@ class _ReportListPageState extends State<ReportListPage> {
     );
   }
 
-  // Function to update the day_range parameter based on selected month and year
   void _updateDayRange() {
     if (selectedMonth != null && selectedYear != null) {
-      // Find the index of the selected month
       int monthIndex =
-          months.indexOf(selectedMonth!) + 1; // +1 because index is 0-based
-      String month = monthIndex
-          .toString()
-          .padLeft(2, '0'); // Ensure two-digit format for month
+          months.indexOf(selectedMonth!) + 1;
+      String month = monthIndex.toString().padLeft(2, '0');
       String year = selectedYear!;
 
-      // Determine the last day of the month
       DateTime firstDayOfMonth = DateTime(int.parse(year), monthIndex, 1);
       DateTime lastDayOfMonth =
-          DateTime(int.parse(year), monthIndex + 1, 0); // 0th day of next month
+      DateTime(int.parse(year), monthIndex + 1, 0);
 
-      // Format the date range
       String startDate = '${year}-${month}-01';
       String endDate =
           '${year}-${month}-${lastDayOfMonth.day.toString().padLeft(2, '0')}';
 
-      // Construct the day_range parameter
-      selectedQuery = 'day_range=${startDate}_to_${endDate}';
+      _reportListController.QuaryController = 'day_range=${startDate}_to_${endDate}';
     } else {
-      // Reset selectedQuery if either month or year is not selected
-      selectedQuery = null;
+      _reportListController.QuaryController = "";
     }
   }
 
-  // Fetch data
   void _fetchData(ReportListViewModel viewModel) {
-    // Check if the query parameter is empty
-    if ((searchByMonth && selectedQuery == "") ||
-        (!searchByMonth && selectedQuery == "")) {
+    if ((searchByMonth && _reportListController.QuaryController == "") ||
+        (!searchByMonth && _reportListController.QuaryController == "")) {
       Utils.showFlashMessage(
         context: context,
         message: 'Please select a query parameter',
-        backgroundColor: Colors.red, // You can customize the color as needed
-        icon: Icons.warning, // Optional: Use an icon if desired
+        backgroundColor: Colors.red,
+        icon: Icons.warning,
       );
-      return; // Exit the method if no query parameter is selected
+      return;
     }
 
-    // Use selectedQuery for API call
-    Utils.showLoading(context); // Show custom loading indicator
-    viewModel.fetchReport(selectedQuery!).then((_) {
-      Utils.cancelLoading(context); // Hide custom loading indicator
+    Utils.showLoading(context);
+    viewModel.fetchReport(_reportListController.QuaryController).then((_) {
+      Utils.cancelLoading(context);
     });
   }
 
-  // Toggle Search By Month
   void _toggleSearchByMonth(bool value) {
     setState(() {
       searchByMonth = value;
-      selectedQuery = ''; // Reset selectedQuery if not in month selection mode
+      _reportListController.QuaryController = '';
       selectedDate = null;
       selectedWeek = null;
     });
   }
+
   Widget _buildHeaderCell(String title) {
     return Text(
       title,
