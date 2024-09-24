@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import '../../controller/reportListController.dart';
+import '../../controller/pageValueController.dart'; // Import the PageValueController
 import '../../utils/components/commonHeader.dart';
 import '../../utils/components/customPicker.dart';
 import 'report_row_widget.dart';
@@ -10,34 +11,23 @@ import '../../view_model/report_list_view_model.dart';
 import '../../res/image_assets.dart';
 import '../../res/app_colors.dart';
 
-
 class ReportListPage extends StatefulWidget {
   @override
   _ReportListPageState createState() => _ReportListPageState();
 }
 
 class _ReportListPageState extends State<ReportListPage> {
-  final ReportListController _reportListController = Get.put(ReportListController()); // Initialize controller
+  final ReportListController _reportListController = Get.put(ReportListController());
+  final PageValueController _pageValueController = Get.put(PageValueController()); // Initialize PageValueController
+
   String? selectedWeek;
   DateTime? selectedDate;
-  DateTime? rangeStartDate;
-  DateTime? rangeEndDate;
   bool searchByMonth = false;
 
   // For month-based search
   final List<String> months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
+    'January', 'February', 'March', 'April', 'May', 'June', 'July',
+    'August', 'September', 'October', 'November', 'December'
   ];
   final List<String> years = List.generate(2044 - DateTime.now().year + 1,
           (index) => (DateTime.now().year + index).toString());
@@ -49,19 +39,39 @@ class _ReportListPageState extends State<ReportListPage> {
   void initState() {
     super.initState();
 
-    // Initialize with current month and year by default
-    DateTime now = DateTime.now();
-    selectedMonth = months[now.month - 1]; // Current month
-    selectedYear = now.year.toString(); // Current year
+    // Check the value of reportListPage
+    if (_pageValueController.reportListPage.value == "0") {
+      // If reportListPage is "0", initialize with the current date and other default values
 
-    // Update day_range based on current month and year
-    _updateDayRange();
+      // Initialize with current date (Today) for date-based search
+      DateTime now = DateTime.now();
+      selectedDate = now;
 
-    // Clear QuaryController if not in month selection mode
-    if (!searchByMonth) {
-      _reportListController.QuaryController = '';
+      if (!searchByMonth) {
+        // Set the QuaryController to today's date
+        _reportListController.QuaryController = 'day=${now.toIso8601String().split('T')[0]}';
+      }
+
+      // Initialize with current month and year for month-based search
+      selectedMonth = months[now.month - 1];
+      selectedYear = now.year.toString();
+
+      if (searchByMonth) {
+        _updateDayRange();
+      }
+    } else if (_pageValueController.reportListPage.value == "1") {
+      // If reportListPage is "1", do not initialize with default values
+      // Delay fetching data until the widget is fully built
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _autoFetchData();
+        // Reset the values after auto-fetch
+        // _pageValueController.updateReportListPage("0");
+        // _reportListController.QuaryController = "";
+      });
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,64 +85,93 @@ class _ReportListPageState extends State<ReportListPage> {
           CommonHeader(
             title: 'Report List',
             hideBackButton: false,
+            resetReportListView: () {
+              // final reportViewModel = Provider.of<ReportListViewModel>(context, listen: false);
+              reportViewModel.clearReportList(); // Clear the report list when going back
+              _reportListController.QuaryController = '';
+              _pageValueController.updateReportListPage("0");
+
+            },
             onBackPress: () {
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Navigate back
             },
           ),
-          Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Search by Month',
-                      style: TextStyle(
-                          fontSize: 15,
-                          color: AppColors.blackColor), // Apply custom styling
+
+          // Conditionally show UI based on reportListPage value
+          Obx(() {
+            if (_pageValueController.reportListPage.value == "0") {
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Search by Month',
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  color: AppColors.blackColor),
+                            ),
+                            Switch(
+                              value: searchByMonth,
+                              onChanged: (value) {
+                                _toggleSearchByMonth(value);
+                              },
+                              activeTrackColor: AppColors.skyBGColor,
+                            ),
+                          ],
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _fetchData(reportViewModel);
+                          },
+                          child: Text(
+                            'Fetch Data',
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: AppColors.activeBGColor),
+                          ),
+                        ),
+                      ],
                     ),
-                    Switch(
-                      value: searchByMonth,
-                      onChanged: (value) {
-                        _toggleSearchByMonth(value);
-                      },
-                      activeTrackColor: AppColors.skyBGColor,
+                  ),
+                  Container(
+                    height: screenHeight * 0.15,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: searchByMonth ? _buildMonthSearch() : _buildDateSearch(),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                TextButton(
-                  onPressed: () {
-                    _fetchData(reportViewModel);
-                  },
-                  child: Text(
-                    'Fetch Data',
-                    style: TextStyle(
-                        fontSize: 15,
-                        color: AppColors.activeBGColor), // Apply custom styling
+                  ),
+                ],
+              );
+            } else if (_pageValueController.reportListPage.value == "1") {
+              // Show header with date from QuaryController
+              String reportDate = _reportListController.QuaryController.split("=")[1];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Text(
+                  'Showing the report list of $reportDate',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.blackColor,
                   ),
                 ),
-              ],
-            ),
-          ),
-          Container(
-            height: screenHeight * 0.15, // Fixed height for the input container
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child:
-                  searchByMonth ? _buildMonthSearch() : _buildDateSearch(),
-                ),
-              ],
-            ),
-          ),
-          // Labels for report status
+              );
+            }
+            return SizedBox.shrink(); // Return empty widget if neither condition matches
+          }),
+
           Padding(
-            padding:
-            EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: screenHeight * 0.00),
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: screenHeight * 0.00),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -162,6 +201,7 @@ class _ReportListPageState extends State<ReportListPage> {
               ],
             ),
           ),
+
           if (reportViewModel.reportList.isNotEmpty) ...[
             SizedBox(height: screenHeight * 0.03),
             Padding(
@@ -337,17 +377,14 @@ class _ReportListPageState extends State<ReportListPage> {
                 style: TextStyle(
                     fontSize: 15,
                     color: AppColors.blackColor,
-                    fontWeight:
-                    FontWeight.w400)),
+                    fontWeight: FontWeight.w400)),
             value: selectedMonth,
             items: months.map((String month) {
               return DropdownMenuItem<String>(
                 value: month,
                 child: Text(
                   month,
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.blackColor),
+                  style: TextStyle(fontSize: 15, color: AppColors.blackColor),
                 ),
               );
             }).toList(),
@@ -367,17 +404,14 @@ class _ReportListPageState extends State<ReportListPage> {
                 style: TextStyle(
                     fontSize: 15,
                     color: AppColors.blackColor,
-                    fontWeight:
-                    FontWeight.w400)),
+                    fontWeight: FontWeight.w400)),
             value: selectedYear,
             items: years.map((String year) {
               return DropdownMenuItem<String>(
                 value: year,
                 child: Text(
                   year,
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.blackColor),
+                  style: TextStyle(fontSize: 15, color: AppColors.blackColor),
                 ),
               );
             }).toList(),
@@ -395,8 +429,7 @@ class _ReportListPageState extends State<ReportListPage> {
 
   void _updateDayRange() {
     if (selectedMonth != null && selectedYear != null) {
-      int monthIndex =
-          months.indexOf(selectedMonth!) + 1;
+      int monthIndex = months.indexOf(selectedMonth!) + 1;
       String month = monthIndex.toString().padLeft(2, '0');
       String year = selectedYear!;
 
@@ -432,10 +465,27 @@ class _ReportListPageState extends State<ReportListPage> {
     });
   }
 
+  // Automatically fetch data when reportListPage is "1"
+  void _autoFetchData() {
+    final reportViewModel = Provider.of<ReportListViewModel>(context, listen: false);
+    Utils.showLoading(context);
+    reportViewModel.fetchReport(_reportListController.QuaryController).then((_) {
+      Utils.cancelLoading(context);
+    });
+  }
+
   void _toggleSearchByMonth(bool value) {
     setState(() {
       searchByMonth = value;
-      _reportListController.QuaryController = '';
+
+      if (searchByMonth) {
+        _updateDayRange();
+      } else {
+        DateTime today = DateTime.now();
+        selectedDate = today;
+        _reportListController.QuaryController = 'day=${today.toIso8601String().split('T')[0]}';
+      }
+
       selectedDate = null;
       selectedWeek = null;
     });
@@ -453,4 +503,5 @@ class _ReportListPageState extends State<ReportListPage> {
       textAlign: TextAlign.center,
     );
   }
+
 }

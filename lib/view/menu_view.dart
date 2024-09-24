@@ -5,7 +5,7 @@ import 'package:ab_lab_app/view/setting_views/settings_view.dart';
 import 'package:ab_lab_app/view/test_views/test_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controller/PageValueController.dart';
+import '../controller/pageValueController.dart';
 import '../res/image_assets.dart';
 
 class MenuView extends StatefulWidget {

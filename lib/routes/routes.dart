@@ -26,7 +26,7 @@ class Routes {
     return CupertinoPageRoute(builder: (_) => AuthPage());
     case RoutesName.sales:
     return PageTransition(type: PageTransitionType.rightToLeft, child: SalesPage());
-    case RoutesName.patientList:
+    case RoutesName.reportList:
     return PageTransition(type: PageTransitionType.rightToLeft, child: ReportListPage());
     case RoutesName.patientEntry:
     return PageTransition(type: PageTransitionType.rightToLeft, child: PatientEntryPage());

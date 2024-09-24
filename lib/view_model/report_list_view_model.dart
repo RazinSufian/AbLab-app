@@ -12,6 +12,7 @@ class ReportListViewModel extends ChangeNotifier {
   bool isLoading = false;
   String errorMessage = '';
 
+  // Fetch report list based on query parameters
   Future<void> fetchReport(String queryParams) async {
     isLoading = true;
     errorMessage = '';
@@ -25,5 +26,12 @@ class ReportListViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  // Clear report list and reset error message
+  void clearReportList() {
+    reportList.clear();
+    errorMessage = '';
+    notifyListeners();
   }
 }

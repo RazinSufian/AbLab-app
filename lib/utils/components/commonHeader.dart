@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../res/app_colors.dart';
 import '../../res/image_assets.dart';
-import '../../utils/utils.dart'; // Import the Utils class
+import '../../utils/utils.dart';
 
 class CommonHeader extends StatelessWidget {
   final String title;
   final bool hideBackButton;
   final VoidCallback? onBackPress;
+  final VoidCallback? resetReportListView;
 
   CommonHeader({
     required this.title,
     this.hideBackButton = false,
     this.onBackPress,
+    this.resetReportListView,
   });
 
   @override
@@ -24,21 +26,21 @@ class CommonHeader extends StatelessWidget {
             if (!hideBackButton)
               IconButton(
                 icon: Image.asset(
-                  ImageAssets.backButton, // Change this to your actual asset path
+                  ImageAssets.backButton,
                   width: 22,
                   height: 22,
                 ),
                 onPressed: () {
-                  // Check if there's a route to pop
                   if (Navigator.of(context).canPop()) {
-                    // If onBackPress is provided, call it, otherwise pop the navigator
+                    if (resetReportListView != null) {
+                      resetReportListView!(); // Reset the report list
+                    }
                     if (onBackPress != null) {
-                      onBackPress!(); // Call the onBackPress callback
+                      onBackPress!();
                     } else {
                       Navigator.of(context).pop();
                     }
                   } else {
-                    // If there's no page to go back to, show a flash message
                     Utils.showFlashMessage(
                       context: context,
                       message: 'No page to go back to',

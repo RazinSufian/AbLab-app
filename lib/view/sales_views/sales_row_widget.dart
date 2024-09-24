@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../controller/reportListController.dart'; // Assuming controllers are stored here
+import '../../controller/pageValueController.dart'; // Assuming controllers are stored here
+import '../../routes/routes.dart';
+import '../../routes/routes_name.dart'; // Assuming routes are defined here
 
 class DataRowWidget extends StatelessWidget {
   final String date;
@@ -8,6 +13,8 @@ class DataRowWidget extends StatelessWidget {
   final String discount;
   final String income;
   final Color backgroundColor;
+
+
 
   const DataRowWidget({
     Key? key,
@@ -22,35 +29,50 @@ class DataRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ReportListController _reportListController = Get.put(ReportListController()); // Find the ReportListController
+    final PageValueController _pageValueController = Get.put(PageValueController()); // Find the PageValueController
     var screenWidth = MediaQuery.of(context).size.width;
     var screenHeight = MediaQuery.of(context).size.height;
 
     // Format the date to "DD-MM-YY"
     final formattedDate = _formatDate(date);
 
-    return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: screenHeight * 0.0115,
-        horizontal: screenWidth * 0.04,
-      ),
-      margin: EdgeInsets.symmetric(
-        vertical: screenHeight * 0.0025,
-        horizontal: screenWidth * 0.015,
-      ),
-      decoration: BoxDecoration(
-        color: backgroundColor, // Set the background color
-        borderRadius: BorderRadius.circular(6), // Add rounded corners
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildDataCell(formattedDate), // Use displayDate here
-          _buildDataCell(totalPatients),
-          _buildDataCell(estimatedTotal),
-          _buildDataCell(unpaid),
-          _buildDataCell(discount),
-          _buildDataCell(income),
-        ],
+    return GestureDetector(
+      onTap: () {
+        // Step 1: Pass the date to the ReportListController's QuaryController
+        _reportListController.QuaryController = 'day=$date';
+        print('QuaryController: ${_reportListController.QuaryController}');
+
+        // Step 2: Set reportListPage to "1"
+        _pageValueController.updateReportListPage("1");
+
+        // Step 3: Navigate to ReportListPage
+        Navigator.pushNamed(context, RoutesName.reportList);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.0115,
+          horizontal: screenWidth * 0.04,
+        ),
+        margin: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.0025,
+          horizontal: screenWidth * 0.015,
+        ),
+        decoration: BoxDecoration(
+          color: backgroundColor, // Set the background color
+          borderRadius: BorderRadius.circular(6), // Add rounded corners
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildDataCell(formattedDate), // Use displayDate here
+            _buildDataCell(totalPatients),
+            _buildDataCell(estimatedTotal),
+            _buildDataCell(unpaid),
+            _buildDataCell(discount),
+            _buildDataCell(income),
+          ],
+        ),
       ),
     );
   }
@@ -78,6 +100,4 @@ class DataRowWidget extends StatelessWidget {
     }
     return date; // Return original date if the format is not as expected
   }
-
-
 }
